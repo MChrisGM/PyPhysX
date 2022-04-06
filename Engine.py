@@ -1,10 +1,12 @@
-import Math
+import math
 
 class Point:
   def __init__(self,x,y,userData):
     self.x = x
     self.y = y
     self.userData = userData
+
+
 
 class Rectangle:
   def __init__(self,x,y,w,h):
@@ -29,6 +31,7 @@ class Rectangle:
       range.y + range.h < self.y - self.h
     )
 
+
 class Circle:
   def __init__(self,x,y,r):
     self.x = x
@@ -37,19 +40,19 @@ class Circle:
     self.rSquared = self.r**2
 
   def contains(self, point):
-    d = Math.pow(point.x - self.x, 2) + Math.pow(point.y - self.y, 2);
+    d = math.pow(point.x - self.x, 2) + math.pow(point.y - self.y, 2);
     return d <= self.rSquared;
 
   def intersects(self, range):
-    xDist = Math.abs(range.x - self.x);
-    yDist = Math.abs(range.y - self.y);
+    xDist = abs(range.x - self.x);
+    yDist = abs(range.y - self.y);
     
     r = self.r;
 
     w = range.w;
     h = range.h;
 
-    edges = Math.pow(xDist - w, 2) + Math.pow(yDist - h, 2);
+    edges = math.pow(xDist - w, 2) + math.pow(yDist - h, 2);
 
     if (xDist > r + w or yDist > r + h):
       return False;
@@ -59,6 +62,7 @@ class Circle:
 
     return edges <= self.rSquared
 
+
 class QuadTree:
   def __init__(self, boundary, capacity):
     if (not boundary):
@@ -67,7 +71,7 @@ class QuadTree:
     if not isinstance(boundary, Rectangle):
       raise ValueError('boundary should be a Rectangle')
 
-    if type(capacity) == int or float:
+    if type(capacity) != (int or float):
       raise ValueError('capacity should be a number but is a', type(capacity))
 
     if (capacity < 1):
@@ -99,8 +103,8 @@ class QuadTree:
     if not self.boundary.contains(point):
       return False
 
-    if (self.points.length < self.capacity):
-      self.points.push(point);
+    if (len(self.points) < self.capacity):
+      self.points.append(point);
       return True
 
     if not self.divided:
@@ -114,7 +118,7 @@ class QuadTree:
     ):
       return True
 
-  def query(self, range, found):
+  def query(self, range, found = False):
     if not found:
       found = []
 
@@ -123,7 +127,7 @@ class QuadTree:
 
     for p in self.points:
       if range.contains(p):
-        found.push(p)
+        found.append(p)
         
     if self.divided:
       self.northwest.query(range, found)
@@ -134,10 +138,58 @@ class QuadTree:
     return found
 
 
+
+
+class Vector:
+  def __init__(self, x = 0, y = 0):
+    self.x = x
+    self.y = y
+
+
+class Ellipse:
+  def __init__(self, rx = 0, ry = 0):
+    self.rx = rx
+    self.ry = ry
+    return
+
+  def getSize(self):
+    if self.rx > self.ry:
+      return self.rx
+    else:
+      return self.ry
+
+
+class Rect:
+  def __init__(self, w = 0, h = 0):
+    self.w = w
+    self.h = h
+    return
+
+
+class Object:
+  def __init__(self, objectType = Ellipse(0, 0), pos = Vector(0,0)):
+    self.shape = objectType
+    self.position = pos
+    self.size = self.shape.getSize()
+    return
+    
+  def update(self):
+    return
+  def interact(self, obj):
+    return
+
+
+
 class Engine:
   def __init__(self, world):
     self.world = world
+    self.objects = []
     return
+
+  def update(self):
+    self.world.advance()
+    return
+
 
 class World:
   def __init__(self, size = (100,100), qtreeSize = 4):
@@ -145,4 +197,23 @@ class World:
     self.qTreeSize = qtreeSize
     self.boundary = Rectangle(self.size[0]/2, self.size[1]/2, self.size[0], self.size[1])
     self.qtree = QuadTree(self.boundary, self.qTreeSize)
+    self.objects = []
     return
+
+  def advance(self):
+    for p in self.objects:
+      object = Point(p.position.x, p.position.y, p)
+      self.qtree.insert(object)
+      p.update()
+
+    for p in self.objects:
+      range = Circle(p.position.x, p.position.y, p.size * 2)
+      points = self.qtree.query(range);
+      for obj in points:
+        other = obj.userData
+        p.interact(other)
+
+  def add(self, obj = Ellipse(0, 0), pos = Vector(0, 0)):
+    self.objects.append(Object(obj, pos))
+    return
+
