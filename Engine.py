@@ -1,4 +1,5 @@
 import math
+import time
 
 class Point:
   def __init__(self,x,y,userData):
@@ -145,6 +146,9 @@ class Vector:
     self.x = x
     self.y = y
 
+  def add(self, vector):
+    self.x+=vector.x
+    self.y+=vector.y
 
 class Ellipse:
   def __init__(self, rx = 0, ry = 0):
@@ -170,11 +174,29 @@ class Object:
   def __init__(self, objectType = Ellipse(0, 0), pos = Vector(0,0)):
     self.shape = objectType
     self.position = pos
+    self.velocity = Vector(0, 0)
+    self.mass = 1
     self.size = self.shape.getSize()
+    self.forces = []
     return
     
-  def update(self):
+  def update(self, gravity = None, g = None):
+    if gravity:
+      self.applyForce(a=g)
+    for f in self.forces:
+      self.velocity.add(f)
+    self.position.add(self.velocity)
+    self.forces = []
     return
+
+  def applyForce(self, f=None, a=None):
+    if f:
+      self.forces.append(f/self.mass)
+    elif a:
+      self.forces.append(a)
+    
+    return
+  
   def interact(self, obj):
     return
 
@@ -183,12 +205,36 @@ class Object:
 class Engine:
   def __init__(self, world):
     self.world = world
+    self.fps = 0
+    self.framerate = 30
     self.objects = []
+    self.gravity = False;
+    self.g = Vector(0, 0)
     return
 
-  def update(self):
-    self.world.advance()
+  def setGravity(self, g=Vector(0, 0)):
+    self.g = g
     return
+
+  def enableGravity(self,state):
+    self.gravity = state
+    return
+
+  def frameRate(self, fps = None):
+    if fps:
+      self.framerate = fps
+    return self.fps
+
+  def update(self):
+    starttime = time.time()
+    self.world.advance(self.gravity, self.g)
+    loadtime = time.time() - starttime
+    if 1000/self.framerate - loadtime > 0:
+      time.sleep(((1000/self.framerate)-loadtime)/1000)
+    finaltime = time.time() - starttime
+    self.fps = 1/finaltime
+    return
+
 
 
 class World:
@@ -200,11 +246,13 @@ class World:
     self.objects = []
     return
 
-  def advance(self):
+  def advance(self, gravity = None, g = None):
+    self.qtree = QuadTree(self.boundary, self.qTreeSize)
+    
     for p in self.objects:
       object = Point(p.position.x, p.position.y, p)
       self.qtree.insert(object)
-      p.update()
+      p.update(gravity, g)
 
     for p in self.objects:
       range = Circle(p.position.x, p.position.y, p.size * 2)
