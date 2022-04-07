@@ -155,10 +155,20 @@ class Vector:
 
 
 class Ellipse:
-  def __init__(self, rx = 0, ry = 0):
+  def __init__(self, rx = 0, ry = 0, detail = 1):
     self.rx = rx
     self.ry = ry
+    if self.rx != 0 and self.ry != 0:
+      self.atoms = self.generateAtoms(detail)
     return
+
+  def generateAtoms(self, step = 1):
+    atoms = []
+    for i in range(0, 360, step):
+      ePX = self.rx  * math.cos(math.radians(i))
+      ePY = self.ry * math.sin(math.radians(i))
+      atoms.append(Vector(ePX, ePY))
+    return atoms
 
   def getSize(self):
     if self.rx > self.ry:
@@ -175,20 +185,31 @@ class Rect:
     self.w = w
     self.h = h
     return
+    
+  def getSize(self):
+    if self.w > self.h:
+      return self.w
+    else:
+      return self.h
+      
+  def __str__(self):
+    return "Rect ("+str(self.w)+", "+str(self.h)+")"
 
 
 class Object:
-  def __init__(self, objectType = Ellipse(0, 0), pos = Vector(0,0)):
-    self.shape = objectType
+  def __init__(self, shape = Ellipse(0, 0), pos = Vector(0,0), mass = 1, gravity = False, immovable = False):
+    self.shape = shape
     self.position = pos
     self.velocity = Vector(0, 0)
     self.mass = 1
     self.size = self.shape.getSize()
     self.forces = []
+    self.affectedByGravity = gravity
+    self.immovable = immovable
     return
     
   def update(self, gravity = None, g = None):
-    if gravity:
+    if gravity and self.affectedByGravity:
       self.applyForce(a=g)
     for f in self.forces:
       self.velocity.add(f)
@@ -205,6 +226,9 @@ class Object:
     return
   
   def interact(self, obj):
+    if self.immovable:
+      return
+
     return
 
   def __str__(self):
@@ -272,8 +296,8 @@ class World:
         other = obj.userData
         p.interact(other)
 
-  def add(self, obj = Ellipse(0, 0), pos = Vector(0, 0)):
-    self.objects.append(Object(obj, pos))
+  def add(self, shape = Ellipse(0, 0), pos = Vector(0, 0), mass = 1, gravity = False, immovable = False):
+    self.objects.append(Object(shape = shape, pos = pos, gravity=gravity, immovable=immovable))
     return
 
 
