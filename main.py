@@ -7,11 +7,12 @@ if __name__ == "__main__":
   engine.frameRate(60)
   
   engine.enableGravity(True)
-  engine.setGravity(Vector(0, 10))
+  engine.setGravity(Vector(0, 1))
 
   world.add(Ellipse(10, 10), Vector(250,250))
 
   while True:
+    print(engine.getObjects())
     engine.update()
     
   

@@ -150,6 +150,10 @@ class Vector:
     self.x+=vector.x
     self.y+=vector.y
 
+  def __str__(self):
+    return "(x:"+str(self.x)+",y:"+str(self.y)+")"
+
+
 class Ellipse:
   def __init__(self, rx = 0, ry = 0):
     self.rx = rx
@@ -161,6 +165,9 @@ class Ellipse:
       return self.rx
     else:
       return self.ry
+
+  def __str__(self):
+    return "Ellipse ("+str(self.rx)+", "+str(self.ry)+")"
 
 
 class Rect:
@@ -200,6 +207,9 @@ class Object:
   def interact(self, obj):
     return
 
+  def __str__(self):
+    return str(self.shape)+", mass: "+str(self.mass)+", position: "+str(self.position)+", velocity: "+str(self.velocity)
+
 
 
 class Engine:
@@ -211,6 +221,9 @@ class Engine:
     self.gravity = False;
     self.g = Vector(0, 0)
     return
+
+  def getObjects(self):
+    return self.world.objects
 
   def setGravity(self, g=Vector(0, 0)):
     self.g = g
@@ -234,8 +247,6 @@ class Engine:
     finaltime = time.time() - starttime
     self.fps = 1/finaltime
     return
-
-
 
 class World:
   def __init__(self, size = (100,100), qtreeSize = 4):
@@ -264,4 +275,5 @@ class World:
   def add(self, obj = Ellipse(0, 0), pos = Vector(0, 0)):
     self.objects.append(Object(obj, pos))
     return
+
 
