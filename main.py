@@ -20,7 +20,8 @@ if __name__ == "__main__":
   world.add(shape = el, pos = Vector(250,250), mass = 1, gravity = True)
   world.add(shape = Rect(500,10),pos = Vector(250,500), gravity = False, immovable = True)
 
-  while True:
+  running = True
+  while running:
     # print(*engine.getObjects(), sep='\n')
 
     for event in pygame.event.get():
