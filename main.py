@@ -15,7 +15,7 @@ if __name__ == "__main__":
   engine.enableGravity(True)
   engine.setGravity(Vector(0, 1))
 
-  el = Ellipse(10, 10)
+  el = Ellipse(30, 30, 1)
   
   world.add(shape = el, pos = Vector(250,250), mass = 1, gravity = True)
   world.add(shape = Rect(500,10),pos = Vector(250,500), gravity = False, immovable = True)
@@ -30,7 +30,8 @@ if __name__ == "__main__":
 
     screen.fill((255, 255, 255))
 
-    pygame.draw.circle(screen, (0, 0, 0), (250, 250), 75)
+    for object in engine.getObjects():
+      pygame.draw.polygon(screen,(0, 0, 0),object.getAtoms())
 
     pygame.display.flip()
     

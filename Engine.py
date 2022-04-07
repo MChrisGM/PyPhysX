@@ -146,6 +146,9 @@ class Vector:
     self.x = x
     self.y = y
 
+  def get(self):
+    return (self.x, self.y)
+
   def add(self, vector):
     self.x+=vector.x
     self.y+=vector.y
@@ -181,10 +184,26 @@ class Ellipse:
 
 
 class Rect:
-  def __init__(self, w = 0, h = 0):
+  def __init__(self, w = 0, h = 0, detail = 1):
     self.w = w
     self.h = h
+    if self.w != 0 and self.h != 0:
+      self.atoms = self.generateAtoms(detail)
     return
+
+  def generateAtoms(self, step = 1):
+    atoms = []
+    for i in range(0,self.w,step):
+      atoms.append(Vector(i,-self.h))
+    for i in range(0,2*self.h,step):
+      atoms.append(Vector(self.w, -self.h+i))
+    for i in range(0,2*self.w,step):
+      atoms.append(Vector(self.w-i, self.h))
+    for i in range(0,2*self.h,step):
+      atoms.append(Vector(-self.w,self.h-i))
+    for i in range(0,self.w,step):
+      atoms.append(Vector(-self.w+i,-self.h))
+    return atoms
     
   def getSize(self):
     if self.w > self.h:
@@ -207,6 +226,15 @@ class Object:
     self.affectedByGravity = gravity
     self.immovable = immovable
     return
+
+  def getAtoms(self):
+    a = [atom.get() for atom in self.shape.atoms]
+    atoms = []
+    for atom in a:
+      x = atom[0]
+      y = atom[1]
+      atoms.append((self.position.x+x,self.position.y+y))
+    return atoms
     
   def update(self, gravity = None, g = None):
     if gravity and self.affectedByGravity:
@@ -228,7 +256,7 @@ class Object:
   def interact(self, obj):
     if self.immovable:
       return
-
+    
     return
 
   def __str__(self):
@@ -242,7 +270,7 @@ class Engine:
     self.fps = 0
     self.framerate = 30
     self.objects = []
-    self.gravity = False;
+    self.gravity = False
     self.g = Vector(0, 0)
     return
 
