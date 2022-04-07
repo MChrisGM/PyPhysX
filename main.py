@@ -12,7 +12,7 @@ if __name__ == "__main__":
   world.add(Ellipse(10, 10), Vector(250,250))
 
   while True:
-    print(engine.getObjects())
+    print(*engine.getObjects())
     engine.update()
     
   
