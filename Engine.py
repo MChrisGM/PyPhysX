@@ -217,6 +217,21 @@ class Vector:
     rad = np.arccos(np.clip(cos, -1.0, 1.0))
     return rad
 
+  def __mul__(self, n):
+    self.x*=n
+    self.y*=n
+    return self
+
+  def __pow__(self, n):
+    self.x = self.x**n
+    self.y = self.y**n
+    return self
+  
+  def __truediv__(self, n):
+    self.x/=n
+    self.y/=n
+    return self
+
   def __str__(self):
     return "(x:"+str(self.x)+",y:"+str(self.y)+")"
 
@@ -307,9 +322,14 @@ class Object:
     self.forces = []
     return
 
-  def applyForce(self, f=None, a=None):
+  def applyForce(self, f=None, a=None, angle=None):
     if f:
-      self.forces.append(Vector(f.x/self.mass,f.y/self.mass))
+      if angle:
+        fx = f.mag()*-math.sin(angle)
+        fy = f.mag()*math.cos(angle)
+        self.forces.append(Vector(fx/self.mass,fy/self.mass))
+      else:
+        self.forces.append(Vector(f.x/self.mass,f.y/self.mass))
     elif a:
       self.forces.append(a)
     return
@@ -343,10 +363,13 @@ class Object:
 
       # angle = math.radians(0)
       angle = (self.velocity.angle(ps[3].sub(ps[2])))-math.pi/2
-      # print(math.degrees(angle))
-      ax = (self.velocity.x*2)*math.sin(angle)
-      ay = (self.velocity.y*2)*-math.cos(angle)
-      self.applyForce(a=Vector(ax,ay))
+      print(math.degrees(angle))
+      f = (self.velocity)*-1
+      # print(f.mag())
+      # ax = f.mag()*math.sin(angle)
+      # ay = f.mag()*math.cos(angle)
+      # self.applyForce(a=Vector(ax,ay))
+      self.applyForce(f=f, angle = angle)
       self.position.x-=self.velocity.x
       self.position.y-=self.velocity.y
 

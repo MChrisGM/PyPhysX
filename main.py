@@ -13,7 +13,7 @@ if __name__ == "__main__":
   engine.frameRate(60)
   
   engine.enableGravity(True)
-  engine.setGravity(Vector(0, 0.5))
+  engine.setGravity(Vector(0, 0.01))
 
   world.add(shape = Ellipse(30, 30, 1), pos = Vector(220, 150), vel = Vector(0, 0), mass = 1, gravity = True)
   world.add(shape = Ellipse(30, 30, 1), pos = Vector(250, 250), vel = Vector(0, 0), mass = 1, gravity = True)
