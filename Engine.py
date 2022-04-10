@@ -307,9 +307,14 @@ class Object:
     self.forces = []
     return
 
-  def applyForce(self, f=None, a=None):
+  def applyForce(self, f=None, a=None, angle=None):
     if f:
-      self.forces.append(Vector(f.x/self.mass,f.y/self.mass))
+      if angle or angle==0:
+        fx = f.mag()*math.sin(angle)
+        fy = f.mag()*-math.cos(angle)
+        self.forces.append(Vector(fx/self.mass,fy/self.mass))
+      else:
+        self.forces.append(Vector(f.x/self.mass,f.y/self.mass))
     elif a:
       self.forces.append(a)
     return
@@ -343,10 +348,11 @@ class Object:
 
       # angle = math.radians(0)
       angle = (self.velocity.angle(ps[3].sub(ps[2])))-math.pi/2
+      f = self.velocity
       # print(math.degrees(angle))
-      ax = (self.velocity.x*2)*math.sin(angle)
-      ay = (self.velocity.y*2)*-math.cos(angle)
-      self.applyForce(a=Vector(ax,ay))
+      # ax = (self.velocity.x*2)*math.sin(angle)
+      # ay = (self.velocity.y*2)*-math.cos(angle)
+      self.applyForce(f = f, angle = angle)
       self.position.x-=self.velocity.x
       self.position.y-=self.velocity.y
 
